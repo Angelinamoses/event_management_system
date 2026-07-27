@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- viewport-fit=cover lets us pad around the iPhone notch / home
+       indicator with env(safe-area-inset-*) further down in style.css -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Feedback | LUNARA — Moonlight Session 3.0</title>
+  <meta name="description" content="Share your feedback on Moonlight Session 3.0 with Team LUNARA." />
+  <meta name="theme-color" content="#0f172a" />
+
+  <!-- Google Fonts: Space Grotesk (display) + Inter (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="feedback.css" />
+</head>
+<body>
+
+  <!-- Decorative background glow — behind everything, ignored by screen readers -->
+  <div class="bg-fx" aria-hidden="true">
+    <div class="glow glow--purple"></div>
+    <div class="glow glow--pink"></div>
+  </div>
+
+  <main class="page">
+    <div class="container">
+
+      <!-- =====================================================
+           HERO
+      ====================================================== -->
+      <section class="hero reveal">
+        <div class="hero__icon" aria-hidden="true">
+          <!-- Music note in a glowing disc -->
+          <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="28" cy="28" r="27" fill="url(#discGradient)" opacity="0.18"/>
+            <path d="M23 38a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9Z" fill="url(#noteGradient)"/>
+            <path d="M23 33V16.8a1 1 0 0 1 .78-.98l12-2.7a1 1 0 0 1 1.22.98V29" stroke="url(#noteGradient)" stroke-width="2" stroke-linecap="round"/>
+            <path d="M37 25.6a4.5 4.5 0 1 1-9 1.9" stroke="url(#noteGradient)" stroke-width="2" stroke-linecap="round" opacity="0"/>
+            <defs>
+              <linearGradient id="discGradient" x1="1" y1="1" x2="55" y2="55" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#8b5cf6"/>
+                <stop offset="1" stop-color="#ec4899"/>
+              </linearGradient>
+              <linearGradient id="noteGradient" x1="19" y1="13" x2="37" y2="38" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#8b5cf6"/>
+                <stop offset="1" stop-color="#ec4899"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+
+        <p class="hero__welcome" id="welcomeMessage" hidden></p>
+
+        <h1 class="hero__title">Thank You <span aria-hidden="true">❤️</span></h1>
+
+        <!-- Read-only confirmation of the Name/Email picked up from the
+             URL — shown so attendees can see who they're submitting
+             feedback as. Never editable, never a form field. -->
+        <p class="hero__identity" id="identityLine" hidden></p>
+
+        <p class="hero__subtitle">
+          Thank you for being part of Moonlight Session 3.0.
+          Your presence, energy and love for music made the evening unforgettable.
+          Every applause, every smile and every memory mattered.
+          We truly appreciate your support.
+        </p>
+      </section>
+
+      <!-- =====================================================
+           FEEDBACK FORM CARD
+      ====================================================== -->
+      <section class="card glass reveal" id="formCard">
+        <form id="feedbackForm" class="form" novalidate>
+
+          <!-- Q1 — Overall rating -->
+          <div class="field">
+            <label class="field__label" id="ratingLabel">Overall Rating <span class="req">*</span></label>
+            <div class="star-rating" id="starRating" role="radiogroup" aria-labelledby="ratingLabel">
+              <button type="button" class="star" data-value="1" role="radio" aria-checked="false" aria-label="1 star">★</button>
+              <button type="button" class="star" data-value="2" role="radio" aria-checked="false" aria-label="2 stars">★</button>
+              <button type="button" class="star" data-value="3" role="radio" aria-checked="false" aria-label="3 stars">★</button>
+              <button type="button" class="star" data-value="4" role="radio" aria-checked="false" aria-label="4 stars">★</button>
+              <button type="button" class="star" data-value="5" role="radio" aria-checked="false" aria-label="5 stars">★</button>
+            </div>
+            <span class="field__error" id="ratingError"></span>
+          </div>
+
+          <!-- Q4 — Favorite song -->
+          <div class="field">
+            <label class="field__label" for="favoriteSong">Favorite Song <span class="req">*</span></label>
+            <input
+              type="text"
+              id="favoriteSong"
+              name="favoriteSong"
+              class="field__input"
+              placeholder="Tell us your favorite song from the event..."
+              autocomplete="off"
+              required
+            />
+            <span class="field__error" id="favoriteSongError"></span>
+          </div>
+
+          <!-- Q5 — Favorite performance -->
+          <div class="field">
+            <label class="field__label" for="favoritePerformance">Favorite Performance <span class="req">*</span></label>
+            <input
+              type="text"
+              id="favoritePerformance"
+              name="favoritePerformance"
+              class="field__input"
+              placeholder="Which performance did you enjoy the most?"
+              autocomplete="off"
+              required
+            />
+            <span class="field__error" id="favoritePerformanceError"></span>
+          </div>
+
+          <!-- Q6 — Suggestions -->
+          <div class="field">
+            <label class="field__label" for="suggestions">Suggestions <span class="req">*</span></label>
+            <textarea
+              id="suggestions"
+              name="suggestions"
+              class="field__input field__textarea"
+              placeholder="Share your suggestions for future Moonlight Sessions..."
+              rows="4"
+              required
+            ></textarea>
+            <span class="field__error" id="suggestionsError"></span>
+          </div>
+
+          <!-- Q7 — Attend again -->
+          <fieldset class="field">
+            <legend class="field__label">Would you attend another LUNARA event? <span class="req">*</span></legend>
+            <div class="radio-group">
+              <label class="radio-pill">
+                <input type="radio" name="attendAgain" value="Definitely" required />
+                <span>Definitely</span>
+              </label>
+              <label class="radio-pill">
+                <input type="radio" name="attendAgain" value="Maybe" />
+                <span>Maybe</span>
+              </label>
+              <label class="radio-pill">
+                <input type="radio" name="attendAgain" value="Probably Not" />
+                <span>Probably Not</span>
+              </label>
+            </div>
+            <span class="field__error" id="attendAgainError"></span>
+          </fieldset>
+
+          <!-- Q8 — Recommend -->
+          <fieldset class="field">
+            <legend class="field__label">Would you recommend LUNARA to your friends? <span class="req">*</span></legend>
+            <div class="radio-group">
+              <label class="radio-pill">
+                <input type="radio" name="recommend" value="Yes" required />
+                <span>Yes</span>
+              </label>
+              <label class="radio-pill">
+                <input type="radio" name="recommend" value="No" />
+                <span>No</span>
+              </label>
+            </div>
+            <span class="field__error" id="recommendError"></span>
+          </fieldset>
+
+          <!-- Q9 — Message to team (optional) -->
+          <div class="field">
+            <label class="field__label" for="messageToTeam">Anything you'd like to share with Team LUNARA?</label>
+            <textarea
+              id="messageToTeam"
+              name="messageToTeam"
+              class="field__input field__textarea"
+              placeholder="We'd love to hear anything you'd like to share..."
+              rows="4"
+            ></textarea>
+          </div>
+
+          <button type="submit" class="btn btn--primary btn--full" id="submitBtn">
+            <span id="submitBtnText">Submit Feedback</span>
+            <span class="spinner" id="submitSpinner" hidden></span>
+          </button>
+        </form>
+      </section>
+
+      <!-- =====================================================
+           SUCCESS CARD (hidden until submission succeeds)
+      ====================================================== -->
+      <section class="card glass result-card" id="successCard" hidden>
+        <div class="result-icon result-icon--success" aria-hidden="true">
+          <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle class="checkmark-circle" cx="36" cy="36" r="33" fill="none" stroke="#22c55e" stroke-width="3"/>
+            <path class="checkmark-check" d="M21 37L31 47L51 25" fill="none" stroke="#22c55e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h2 class="result-title">Thank You!</h2>
+        <p class="result-message">
+          Your feedback has been submitted successfully. Thank you for taking the time to share your experience.
+          Your valuable feedback helps Team LUNARA create even better events in the future.
+          We hope to see you again at the next Moonlight Session.
+        </p>
+        <div class="result-actions">
+          <a href="https://angelinamoses.github.io/moonlight-session-3/" class="btn btn--secondary">🏠 Back to Home</a>
+          <a href="https://www.instagram.com/lunara.official/" target="_blank" rel="noopener noreferrer" class="btn btn--secondary">📷 Follow Us on Instagram</a>
+        </div>
+      </section>
+
+      <!-- =====================================================
+           ERROR CARD (hidden until a submission fails)
+      ====================================================== -->
+      <section class="card glass result-card" id="errorCard" hidden>
+        <div class="result-icon result-icon--error" aria-hidden="true">
+          <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="36" cy="36" r="33" fill="none" stroke="#fb7185" stroke-width="3"/>
+            <path d="M26 26L46 46M46 26L26 46" stroke="#fb7185" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h2 class="result-title">Something went wrong</h2>
+        <p class="result-message">Something went wrong while submitting your feedback. Please try again.</p>
+        <div class="result-actions">
+          <button type="button" class="btn btn--primary" id="retryBtn">Retry</button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- =====================================================
+       FOOTER
+  ====================================================== -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p class="footer__made">Made with <span aria-hidden="true">❤️</span><span class="sr-only">love</span> by Team LUNARA</p>
+      <nav class="footer__links" aria-label="Footer">
+        <a href="https://angelinamoses.github.io/moonlight-session-3/">Home</a>
+        <a href="https://www.instagram.com/lunara.official/" target="_blank" rel="noopener noreferrer">Instagram</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="feedback.js"></script>
+</body>
+</html>
