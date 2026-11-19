@@ -2,7 +2,7 @@
    IMPORTANT: The backend must create orders and verify signatures.
    Never place RAZORPAY_KEY_SECRET in this file. */
 const TICKET_PRICE = 499;
-const API_BASE_URL = "rzp_live_TEDTCjjrNaJSqo"; // Set to your deployed HTTPS backend URL, e.g. https://your-api.onrender.com
+const API_BASE_URL = "https://lunara-snow-fall-backend.onrender.com/"; // Set to your deployed HTTPS backend URL, e.g. https://your-api.onrender.com
 
 const form = document.getElementById("registrationForm");
 const ticketSelect = document.getElementById("tickets");
