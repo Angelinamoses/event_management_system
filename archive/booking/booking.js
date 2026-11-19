@@ -24,7 +24,7 @@
    If you're still testing, swap in a "rzp_test_..." key from the
    Razorpay dashboard first, then switch back to the live key at launch.
 ------------------------------------------------------------------------ */
-const RAZORPAY_KEY = "rzp_live_TEDTCjjrNaJSqo";
+const RAZORPAY_KEY = "";
 
 // Single source of truth for ticket price. Changing this one number
 // updates the price shown in the UI and every total calculation.
