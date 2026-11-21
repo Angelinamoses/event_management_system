@@ -119,8 +119,23 @@
                 <option value="3">3 tickets</option><option value="4">4 tickets</option><option value="5">5 tickets</option>
               </select>
             </div>
+            <div class="crew-deal" id="crewDeal">
+              <div class="crew-deal-top">
+                <span class="crew-deal-kicker">✳ THE LUNARA CREW DEAL</span>
+                <span class="crew-deal-badge">15% OFF</span>
+              </div>
+              <p>Good music hits different together. Book exactly 5 tickets and unlock an exclusive group saving.</p>
+              <div class="coupon-controls">
+                <label class="visually-hidden" for="couponCode">Coupon code</label>
+                <input id="couponCode" name="couponCode" type="text" placeholder="Enter coupon code" autocomplete="off" maxlength="20" aria-describedby="couponStatus">
+                <button id="applyCouponButton" type="button">Apply</button>
+              </div>
+              <p class="coupon-status" id="couponStatus" role="status" aria-live="polite">Use <strong>SNOW15</strong> when booking exactly 5 tickets.</p>
+            </div>
             <div class="total-box">
               <div><span>Ticket price</span><strong id="ticketPriceDisplay">₹499</strong></div>
+              <div><span>Subtotal</span><strong id="subtotalDisplay">₹499</strong></div>
+              <div class="discount-row" id="discountRow" hidden><span>SNOW15 discount</span><strong id="discountAmountDisplay">−₹0</strong></div>
               <div class="total-row"><span>Total payable</span><strong id="totalAmountDisplay">₹499</strong></div>
             </div>
             <button class="button button-primary submit-button" id="payButton" type="submit">
@@ -140,6 +155,7 @@
             <div class="success-icon">✓</div><p class="eyebrow">YOU'RE ON THE LIST</p>
             <h3>Booking confirmed.</h3>
             <p>Your payment has been verified and your booking is complete. Check your email for the confirmation.</p>
+            <p class="success-promo" id="successSavingsMessage" hidden></p>
             <a class="button button-secondary" href="#home">Back to top ↑</a>
           </div>
         </div>
