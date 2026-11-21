@@ -81,6 +81,7 @@ applyCouponButton.addEventListener("click", () => {
   if (code !== "SNOW15") {
     appliedCoupon = "";
     applyCouponButton.textContent = "Apply";
+    updateTotal();
     couponStatus.textContent = "That code doesn't look right. Please check it and try again.";
     couponStatus.classList.add("coupon-status--error");
     return;
@@ -102,6 +103,14 @@ applyCouponButton.addEventListener("click", () => {
   couponStatus.textContent = "SNOW15 applied. You save " + money(discountPaise / 100) + " on your crew booking.";
   couponStatus.classList.add("coupon-status--success");
   updateTotal();
+});
+
+couponCodeInput.addEventListener("input", () => {
+  if (appliedCoupon && couponCodeInput.value.trim().toUpperCase() !== appliedCoupon) {
+    appliedCoupon = "";
+    applyCouponButton.textContent = "Apply";
+    updateTotal();
+  }
 });
 
 ticketSelect.addEventListener("change", updateTotal);
