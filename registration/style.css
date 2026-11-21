@@ -92,3 +92,29 @@ body{font-size:17px}
  .form-heading h3,.success-screen h3,.payment-result h3{font-size:1.65rem}
  .form-heading p{font-size:.88rem}
 }
+
+
+/* Lunara Crew Deal coupon styling */
+.crew-deal{margin:19px 0 20px;padding:18px 19px;border:1px solid rgba(120,190,240,.28);border-radius:16px;background:linear-gradient(115deg,rgba(113,87,190,.16),rgba(17,190,203,.10));box-shadow:inset 0 1px rgba(255,255,255,.035);transition:border-color .2s,box-shadow .2s}
+.crew-deal--eligible{border-color:rgba(75,220,205,.58);box-shadow:0 0 0 3px rgba(19,217,243,.07),inset 0 1px rgba(255,255,255,.05)}
+.crew-deal-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.crew-deal-kicker{font-size:.68rem;font-weight:800;letter-spacing:.13em;color:#b7c5ed}
+.crew-deal-badge{padding:5px 10px;border-radius:999px;background:rgba(19,217,243,.13);border:1px solid rgba(19,217,243,.32);color:#8cecf4;font-size:.68rem;font-weight:800;letter-spacing:.08em;white-space:nowrap}
+.crew-deal>p:not(.coupon-status){margin:10px 0 13px;color:#c1cbe0;font-size:.82rem;line-height:1.65}
+.coupon-controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px}
+.coupon-controls input{min-width:0;width:100%;padding:12px 13px;border:1px solid rgba(145,167,222,.25);border-radius:10px;background:rgba(5,12,28,.72);color:#f4f6ff;outline:none;font-size:.88rem;text-transform:uppercase}
+.coupon-controls input::placeholder{color:#7785a3;text-transform:none}
+.coupon-controls input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(19,217,243,.09)}
+.coupon-controls button{padding:0 17px;border:1px solid rgba(90,202,233,.35);border-radius:10px;background:linear-gradient(110deg,rgba(155,121,255,.2),rgba(19,217,243,.18));color:#eaf9ff;font-size:.82rem;font-weight:800;cursor:pointer;transition:background .2s,transform .2s}
+.coupon-controls button:hover{background:linear-gradient(110deg,rgba(155,121,255,.32),rgba(19,217,243,.28));transform:translateY(-1px)}
+.coupon-status{margin-top:9px;color:#9aa9c5;font-size:.72rem;line-height:1.5}
+.coupon-status strong{color:#c9e9ff;letter-spacing:.07em}
+.coupon-status--success{color:#77e5bd}
+.coupon-status--error{color:#ff9ab2}
+.discount-row{color:#78e1b7!important}
+.discount-row strong{color:#78e1b7!important}
+.discount-row[hidden]{display:none}
+.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.success-promo{max-width:390px;margin:0 auto 20px!important;padding:12px 15px;border:1px solid rgba(85,215,176,.28);border-radius:12px;background:rgba(85,215,176,.08);color:#83e7c0!important;font-size:.82rem!important}
+.success-promo[hidden]{display:none}
+@media(max-width:390px){.coupon-controls{grid-template-columns:1fr}.coupon-controls button{min-height:44px}}
