@@ -111,6 +111,20 @@ async function getVerifiedBooking(orderId, paymentId) {
     }
 
     const quantity = Number(notes.quantity);
+    const couponCode = String(notes.couponCode || "").trim().toUpperCase();
+
+    if (
+        couponCode &&
+        !(couponCode === "SNOW15" && quantity === 5)
+    ) {
+        throw new Error("Coupon eligibility could not be validated.");
+    }
+
+    const subtotalPaise = TICKET_PRICE * quantity * 100;
+    const discountPaise = couponCode === "SNOW15"
+        ? Math.round(subtotalPaise * 0.15)
+        : 0;
+    const expectedAmountPaise = subtotalPaise - discountPaise;
 
     const booking = {
         bookingId: order.receipt,
@@ -118,6 +132,9 @@ async function getVerifiedBooking(orderId, paymentId) {
         email: notes.email,
         phone: notes.phone,
         quantity,
+        couponCode,
+        subtotal: subtotalPaise / 100,
+        discountAmount: discountPaise / 100,
         amount: order.amount / 100,
         paymentId: payment.id,
         paymentStatus: "PAID"
@@ -132,7 +149,7 @@ async function getVerifiedBooking(orderId, paymentId) {
         !Number.isInteger(quantity) ||
         quantity < 1 ||
         quantity > 10 ||
-        booking.amount !== TICKET_PRICE * quantity ||
+        order.amount !== expectedAmountPaise ||
         order.currency !== "INR"
     ) {
         throw new Error("Registration details could not be validated.");
@@ -284,20 +301,26 @@ app.get("/", (req, res) => {
 app.post("/api/create-order", async (req, res) => {
     try {
         const { name, email, phone, quantity } = req.body;
+        const requestedCoupon = typeof req.body.couponCode === "string"
+            ? req.body.couponCode.trim().toUpperCase()
+            : "";
 
         const cleanName = typeof name === "string" ? name.trim() : "";
         const cleanEmail = typeof email === "string"
             ? email.trim().toLowerCase()
             : "";
-        const cleanPhone = typeof phone === "string" ? phone.trim() : "";
+        const cleanPhone = String(phone || "").replace(/\D/g, "")
+            .replace(/^91(?=\d{10}$)/, "")
+            .replace(/^0(?=\d{10}$)/, "");
+        const cleanQuantity = Number(quantity);
 
         if (
             !cleanName ||
             !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail) ||
             !/^\d{10}$/.test(cleanPhone) ||
-            !Number.isInteger(quantity) ||
-            quantity < 1 ||
-            quantity > 10
+            !Number.isInteger(cleanQuantity) ||
+            cleanQuantity < 1 ||
+            cleanQuantity > 10
         ) {
             return res.status(400).json({
                 success: false,
@@ -305,8 +328,23 @@ app.post("/api/create-order", async (req, res) => {
             });
         }
 
+        if (requestedCoupon && !(requestedCoupon === "SNOW15" && cleanQuantity === 5)) {
+            return res.status(400).json({
+                success: false,
+                message: requestedCoupon === "SNOW15"
+                    ? "SNOW15 is valid when booking exactly 5 tickets."
+                    : "That coupon code is not valid."
+            });
+        }
+
+        const subtotalPaise = TICKET_PRICE * cleanQuantity * 100;
+        const discountPaise = requestedCoupon === "SNOW15"
+            ? Math.round(subtotalPaise * 0.15)
+            : 0;
+        const finalAmountPaise = subtotalPaise - discountPaise;
+
         const order = await razorpay.orders.create({
-            amount: TICKET_PRICE * quantity * 100,
+            amount: finalAmountPaise,
             currency: "INR",
             receipt: `snowfall_${Date.now()}`,
             notes: {
@@ -315,18 +353,28 @@ app.post("/api/create-order", async (req, res) => {
                 name: cleanName,
                 email: cleanEmail,
                 phone: cleanPhone,
-                quantity: String(quantity)
+                quantity: String(cleanQuantity),
+                couponCode: requestedCoupon,
+                subtotal: (subtotalPaise / 100).toFixed(2),
+                discountAmount: (discountPaise / 100).toFixed(2)
             }
         });
 
-        console.log("[ORDER] Created:", order.id);
+        console.log("[ORDER] Created:", order.id, {
+            quantity: cleanQuantity,
+            couponCode: requestedCoupon || "NONE",
+            amountPaise: order.amount
+        });
 
         return res.json({
             success: true,
             orderId: order.id,
             keyId: process.env.RAZORPAY_KEY_ID,
             amount: order.amount,
-            currency: order.currency
+            currency: order.currency,
+            couponCode: requestedCoupon,
+            subtotal: subtotalPaise / 100,
+            discountAmount: discountPaise / 100
         });
 
     } catch (error) {
