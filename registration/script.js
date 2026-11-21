@@ -58,8 +58,8 @@ function updateTotal() {
   totalAmountDisplay.textContent = money(totalPaise / 100);
   crewDeal.classList.toggle("crew-deal--eligible", quantity === 5);
 
-  if (!appliedCoupon && !couponStatus.classList.contains("coupon-status--error")) {
-    couponStatus.classList.remove("coupon-status--success");
+  if (!appliedCoupon) {
+    couponStatus.classList.remove("coupon-status--success", "coupon-status--error");
     couponStatus.textContent = quantity === 5
       ? "Your 5-ticket booking qualifies. Enter SNOW15 to save 15%."
       : "Book exactly 5 tickets to unlock 15% off with SNOW15.";
@@ -83,7 +83,6 @@ applyCouponButton.addEventListener("click", () => {
     applyCouponButton.textContent = "Apply";
     couponStatus.textContent = "That code doesn't look right. Please check it and try again.";
     couponStatus.classList.add("coupon-status--error");
-    updateTotal();
     return;
   }
 
