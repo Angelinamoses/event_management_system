@@ -7,7 +7,15 @@ const API_BASE_URL = "https://lunara-snow-fall-backend.onrender.com"; // Set to 
 const form = document.getElementById("registrationForm");
 const ticketSelect = document.getElementById("tickets");
 const ticketPriceDisplay = document.getElementById("ticketPriceDisplay");
+const subtotalDisplay = document.getElementById("subtotalDisplay");
 const totalAmountDisplay = document.getElementById("totalAmountDisplay");
+const discountRow = document.getElementById("discountRow");
+const discountAmountDisplay = document.getElementById("discountAmountDisplay");
+const crewDeal = document.getElementById("crewDeal");
+const couponCodeInput = document.getElementById("couponCode");
+const applyCouponButton = document.getElementById("applyCouponButton");
+const couponStatus = document.getElementById("couponStatus");
+const successSavingsMessage = document.getElementById("successSavingsMessage");
 const statusEl = document.getElementById("formStatus");
 const payButton = document.getElementById("payButton");
 const payButtonText = document.getElementById("payButtonText");
@@ -16,14 +24,95 @@ const errorScreen = document.getElementById("errorScreen");
 const errorMessage = document.getElementById("paymentErrorMessage");
 const retryButton = document.getElementById("retryPaymentButton");
 let lastPayload = null;
+let appliedCoupon = "";
 
-const money = value => "₹" + Number(value).toLocaleString("en-IN");
+const money = value => {
+  const amount = Number(value);
+  return "₹" + amount.toLocaleString("en-IN", {
+    minimumFractionDigits: Number.isInteger(amount) ? 0 : 2,
+    maximumFractionDigits: 2
+  });
+};
 
 function updateTotal() {
   const quantity = Number(ticketSelect.value) || 1;
+
+  if (appliedCoupon && quantity !== 5) {
+    appliedCoupon = "";
+    applyCouponButton.textContent = "Apply";
+    couponStatus.textContent = "SNOW15 applies to exactly 5 tickets. Select 5 tickets and apply the code again.";
+    couponStatus.classList.remove("coupon-status--success");
+    couponStatus.classList.add("coupon-status--error");
+  }
+
+  const subtotalPaise = TICKET_PRICE * quantity * 100;
+  const discountPaise = appliedCoupon === "SNOW15" && quantity === 5
+    ? Math.round(subtotalPaise * 0.15)
+    : 0;
+  const totalPaise = subtotalPaise - discountPaise;
+
   ticketPriceDisplay.textContent = money(TICKET_PRICE);
-  totalAmountDisplay.textContent = money(TICKET_PRICE * quantity);
+  subtotalDisplay.textContent = money(subtotalPaise / 100);
+  discountRow.hidden = discountPaise === 0;
+  discountAmountDisplay.textContent = "−" + money(discountPaise / 100);
+  totalAmountDisplay.textContent = money(totalPaise / 100);
+  crewDeal.classList.toggle("crew-deal--eligible", quantity === 5);
+
+  if (!appliedCoupon) {
+    couponStatus.classList.remove("coupon-status--success", "coupon-status--error");
+    couponStatus.textContent = quantity === 5
+      ? "Your 5-ticket booking qualifies. Enter SNOW15 to save 15%."
+      : "Book exactly 5 tickets to unlock 15% off with SNOW15.";
+  }
 }
+
+applyCouponButton.addEventListener("click", () => {
+  const code = couponCodeInput.value.trim().toUpperCase();
+  const quantity = Number(ticketSelect.value);
+
+  couponStatus.classList.remove("coupon-status--success", "coupon-status--error");
+
+  if (!code) {
+    couponStatus.textContent = "Enter SNOW15 to apply your group offer.";
+    couponStatus.classList.add("coupon-status--error");
+    return;
+  }
+
+  if (code !== "SNOW15") {
+    appliedCoupon = "";
+    applyCouponButton.textContent = "Apply";
+    updateTotal();
+    couponStatus.textContent = "That code doesn't look right. Please check it and try again.";
+    couponStatus.classList.add("coupon-status--error");
+    return;
+  }
+
+  if (quantity !== 5) {
+    appliedCoupon = "";
+    applyCouponButton.textContent = "Apply";
+    couponStatus.textContent = "SNOW15 is an exclusive offer for exactly 5 tickets.";
+    couponStatus.classList.add("coupon-status--error");
+    updateTotal();
+    return;
+  }
+
+  appliedCoupon = "SNOW15";
+  couponCodeInput.value = "SNOW15";
+  applyCouponButton.textContent = "Applied ✓";
+  const discountPaise = Math.round(TICKET_PRICE * quantity * 100 * 0.15);
+  couponStatus.textContent = "SNOW15 applied. You save " + money(discountPaise / 100) + " on your crew booking.";
+  couponStatus.classList.add("coupon-status--success");
+  updateTotal();
+});
+
+couponCodeInput.addEventListener("input", () => {
+  if (appliedCoupon && couponCodeInput.value.trim().toUpperCase() !== appliedCoupon) {
+    appliedCoupon = "";
+    applyCouponButton.textContent = "Apply";
+    updateTotal();
+  }
+});
+
 ticketSelect.addEventListener("change", updateTotal);
 updateTotal();
 
@@ -67,7 +156,7 @@ async function postJSON(path, data) {
     body: JSON.stringify(data)
   });
   const result = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(result.error || "Payment service is temporarily unavailable.");
+  if (!response.ok) throw new Error(result.message || result.error || "Payment service is temporarily unavailable.");
   return result;
 }
 
@@ -93,7 +182,8 @@ form.addEventListener("submit", async event => {
     name: document.getElementById("fullName").value.trim(),
     email: document.getElementById("email").value.trim(),
     phone: document.getElementById("phone").value.trim(),
-    quantity: Number(ticketSelect.value)
+    quantity: Number(ticketSelect.value),
+    couponCode: appliedCoupon
   };
 
   payButton.disabled = true;
@@ -103,6 +193,14 @@ form.addEventListener("submit", async event => {
     const order = await postJSON("/api/create-order", lastPayload);
     if (!order.orderId || !order.keyId || !order.amount || order.currency !== "INR") {
       throw new Error("The payment server returned incomplete order details.");
+    }
+
+    const expectedSubtotalPaise = TICKET_PRICE * lastPayload.quantity * 100;
+    const expectedDiscountPaise = lastPayload.couponCode === "SNOW15"
+      ? Math.round(expectedSubtotalPaise * 0.15)
+      : 0;
+    if (Number(order.amount) !== expectedSubtotalPaise - expectedDiscountPaise) {
+      throw new Error("The payment amount does not match your ticket and coupon selection. Please contact the event team.");
     }
 
     const checkout = new Razorpay({
@@ -134,6 +232,13 @@ form.addEventListener("submit", async event => {
             form.hidden = true;
             errorScreen.hidden = true;
             successScreen.hidden = false;
+            if (lastPayload.couponCode === "SNOW15") {
+              const savedPaise = Math.round(TICKET_PRICE * 5 * 100 * 0.15);
+              successSavingsMessage.textContent = "Crew deal unlocked! SNOW15 saved you " + money(savedPaise / 100) + ".";
+              successSavingsMessage.hidden = false;
+            } else {
+              successSavingsMessage.hidden = true;
+            }
           } else {
             throw new Error("Payment could not be verified. Please contact the event team before trying again.");
           }
